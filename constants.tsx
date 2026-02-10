@@ -19,12 +19,12 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { name: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: ['Teacher', 'Counselor', 'Administrator'] },
-  { name: 'Incidents', icon: <AlertTriangle size={20} />, roles: ['Teacher', 'Administrator'] },
+  { name: 'Incidents', icon: <AlertTriangle size={20} />, roles: ['Teacher', 'Counselor', 'Administrator'] },
   { name: 'Students', icon: <Users size={20} />, roles: ['Teacher', 'Counselor', 'Administrator'] },
   { name: 'Interventions', icon: <ShieldAlert size={20} />, roles: ['Counselor', 'Administrator'] },
-  { name: 'Device Logs', icon: <Monitor size={20} />, roles: ['Administrator'] },
   { name: 'Reports', icon: <ClipboardList size={20} />, roles: ['Counselor', 'Administrator'] },
-  { name: 'Admin', icon: <Settings size={20} />, roles: ['Administrator'] },
+  { name: 'System Logs', icon: <Monitor size={20} />, roles: ['Administrator'] },
+  { name: 'User Management', icon: <Settings size={20} />, roles: ['Administrator'] },
 ];
 
 export const MOCK_STUDENTS: Student[] = [
@@ -97,6 +97,18 @@ export const MOCK_INCIDENTS: Incident[] = [
     description: 'Found with unauthorized materials during history quiz.',
     immediate_action: 'Paper confiscated, teacher notified.',
     status: 'Pending'
+  },
+  {
+    id: 'i3',
+    student_id: 's1',
+    reported_by_user_id: 'u_counselor',
+    incident_type_id: 'it4',
+    date_reported: '2023-10-26T11:00:00Z',
+    date_occurred: '2023-10-26T10:45:00Z',
+    location: 'Hallway',
+    description: 'Verbal dispute between two students over a book.',
+    immediate_action: 'Separated students.',
+    status: 'Resolved'
   }
 ];
 

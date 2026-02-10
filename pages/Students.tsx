@@ -1,15 +1,22 @@
 
 import React, { useState } from 'react';
 import { MOCK_STUDENTS, MOCK_INCIDENTS } from '../constants';
-import { Search, Filter, Plus, Mail, Phone, MapPin, BrainCircuit, Users } from 'lucide-react';
+import { Search, Plus, MapPin, Phone, BrainCircuit, Users, ShieldAlert, Lock } from 'lucide-react';
 import { getBehavioralInsight } from '../services/geminiService';
+import { User } from '../types';
 
-const Students: React.FC = () => {
+interface StudentsProps {
+  currentUser: User;
+}
+
+const Students: React.FC<StudentsProps> = ({ currentUser }) => {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const selectedStudent = MOCK_STUDENTS.find(s => s.id === selectedStudentId);
+  const isTeacher = currentUser.role === 'Teacher';
+  const canAccessSensitiveData = currentUser.role !== 'Teacher';
 
   const handleAnalyze = async (studentId: string) => {
     setIsAnalyzing(true);
@@ -25,16 +32,18 @@ const Students: React.FC = () => {
       <div className="lg:col-span-1 bg-white border border-slate-200 rounded-xl flex flex-col h-[calc(100vh-10rem)] shadow-sm">
         <div className="p-4 border-b border-slate-200 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-slate-800">Students</h3>
-            <button className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-              <Plus size={16} />
-            </button>
+            <h3 className="font-bold text-slate-800">Student Directory</h3>
+            {!isTeacher && (
+              <button className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                <Plus size={16} />
+              </button>
+            )}
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input 
               type="text" 
-              placeholder="Filter by name or LRN..."
+              placeholder="Search by name or LRN..."
               className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
             />
           </div>
@@ -56,10 +65,7 @@ const Students: React.FC = () => {
               </div>
               <div className="flex-1 overflow-hidden">
                 <p className="text-sm font-semibold text-slate-900">{student.first_name} {student.last_name}</p>
-                <p className="text-xs text-slate-500 truncate">LRN: {student.lrn}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] font-bold text-slate-400 uppercase">{student.grade_level}</p>
+                <p className="text-xs text-slate-500">Grade {student.grade_level}</p>
               </div>
             </button>
           ))}
@@ -78,60 +84,42 @@ const Students: React.FC = () => {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900">{selectedStudent.first_name} {selectedStudent.last_name}</h2>
-                    <p className="text-slate-500 font-medium">Class {selectedStudent.grade_level} - Section {selectedStudent.section}</p>
+                    <p className="text-slate-500 font-medium">LRN: {selectedStudent.lrn} • {selectedStudent.grade_level} - {selectedStudent.section}</p>
                     <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
                       <span className="flex items-center gap-1"><MapPin size={14} /> {selectedStudent.address}</span>
-                      <span className="flex items-center gap-1"><Phone size={14} /> {selectedStudent.contact_number}</span>
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50">Edit Profile</button>
+                {!isTeacher && (
                   <button 
                     onClick={() => handleAnalyze(selectedStudent.id)}
                     disabled={isAnalyzing}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 flex items-center gap-2 disabled:opacity-50"
                   >
                     <BrainCircuit size={16} />
-                    {isAnalyzing ? 'Analyzing...' : 'AI Insights'}
+                    {isAnalyzing ? 'Analyzing...' : 'AI Welfare Check'}
                   </button>
-                </div>
+                )}
               </div>
 
               {aiAnalysis && (
                 <div className="mb-8 p-6 bg-indigo-50 border border-indigo-100 rounded-xl animate-in slide-in-from-top-4 duration-300">
                   <div className="flex items-center gap-2 mb-4">
                     <BrainCircuit className="text-indigo-600" size={20} />
-                    <h4 className="text-indigo-900 font-bold">AI Behavioral Analysis</h4>
-                    <span className={`ml-auto px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                      aiAnalysis.riskLevel === 'Low' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                    }`}>
-                      Risk Level: {aiAnalysis.riskLevel}
-                    </span>
+                    <h4 className="text-indigo-900 font-bold">Confidential Welfare Insight</h4>
                   </div>
                   <p className="text-sm text-indigo-800 leading-relaxed mb-4">{aiAnalysis.analysis}</p>
-                  <div className="space-y-2">
-                    <p className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Suggested Interventions</p>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {aiAnalysis.suggestedInterventions.map((item: string, i: number) => (
-                        <li key={i} className="text-sm text-indigo-700 flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100">
                 <div className="space-y-1">
-                  <p className="text-xs font-bold text-slate-400 uppercase">LRN Number</p>
-                  <p className="text-sm font-semibold text-slate-800">{selectedStudent.lrn}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase">Status</p>
+                  <p className="text-sm font-semibold text-emerald-600">Active Student</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs font-bold text-slate-400 uppercase">Birth Date</p>
-                  <p className="text-sm font-semibold text-slate-800">{new Date(selectedStudent.date_of_birth).toLocaleDateString()}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase">Contact</p>
+                  <p className="text-sm font-semibold text-slate-800">{selectedStudent.contact_number}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs font-bold text-slate-400 uppercase">Gender</p>
@@ -141,43 +129,68 @@ const Students: React.FC = () => {
             </div>
 
             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-              <div className="p-4 border-b border-slate-200">
-                <h4 className="font-bold text-slate-800">Incident History</h4>
+              <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                <div className="flex items-center gap-2 text-slate-800">
+                  <ShieldAlert size={18} className="text-indigo-600" />
+                  <h4 className="font-bold">Welfare & Disciplinary History</h4>
+                </div>
+                {isTeacher && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-amber-50 text-amber-700 rounded text-[10px] font-bold border border-amber-100 uppercase">
+                    <Lock size={12} /> Access Restricted
+                  </div>
+                )}
               </div>
-              <table className="w-full text-left">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase">Type</th>
-                    <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase">Date</th>
-                    <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {MOCK_INCIDENTS.filter(i => i.student_id === selectedStudent.id).map(inc => (
-                    <tr key={inc.id}>
-                      <td className="px-6 py-4 text-sm font-medium text-slate-700">Academic Dishonesty</td>
-                      <td className="px-6 py-4 text-sm text-slate-500">{new Date(inc.date_reported).toLocaleDateString()}</td>
-                      <td className="px-6 py-4">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">
-                          {inc.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                  {MOCK_INCIDENTS.filter(i => i.student_id === selectedStudent.id).length === 0 && (
+              
+              {canAccessSensitiveData ? (
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50">
                     <tr>
-                      <td colSpan={3} className="px-6 py-8 text-center text-sm text-slate-400 italic">No incidents recorded for this student.</td>
+                      <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase">Event Type</th>
+                      <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase">Date</th>
+                      <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase">Status</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {MOCK_INCIDENTS.filter(i => i.student_id === selectedStudent.id).map(inc => (
+                      <tr key={inc.id}>
+                        <td className="px-6 py-4">
+                          <p className="text-sm font-medium text-slate-700">Disciplinary Report</p>
+                          <p className="text-xs text-slate-400">Reported by {inc.reported_by_user_id === currentUser.id ? 'You' : 'Staff'}</p>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-slate-500">{new Date(inc.date_reported).toLocaleDateString()}</td>
+                        <td className="px-6 py-4">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">
+                            {inc.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {MOCK_INCIDENTS.filter(i => i.student_id === selectedStudent.id).length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="px-6 py-8 text-center text-sm text-slate-400 italic">No behavioral history records.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="p-12 text-center flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-300">
+                    <Lock size={32} />
+                  </div>
+                  <div className="max-w-sm">
+                    <p className="text-sm font-semibold text-slate-800 mb-1">Confidential Information</p>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Detailed intervention and disciplinary histories are restricted to Guidance Counselors and Administrators to maintain student privacy.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         ) : (
           <div className="h-full border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-400">
-            {/* Fix: Added missing Users icon import from lucide-react */}
-            <Users size={48} className="mb-4 opacity-20" />
-            <p>Select a student to view their detailed behavioral profile</p>
+            <Users size={48} className="mb-4 opacity-10" />
+            <p className="text-sm">Select a student from the directory to view profile</p>
           </div>
         )}
       </div>

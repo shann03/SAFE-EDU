@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Students from './pages/Students';
 import Incidents from './pages/Incidents';
 import Interventions from './pages/Interventions';
+import UserManagement from './pages/UserManagement';
 import Login from './pages/Login';
 import { User } from './types';
 
@@ -57,11 +58,13 @@ const App: React.FC = () => {
       case 'Dashboard':
         return <Dashboard />;
       case 'Students':
-        return <Students />;
+        return <Students currentUser={currentUser} />;
       case 'Incidents':
-        return <Incidents />;
+        return <Incidents currentUser={currentUser} />;
       case 'Interventions':
-        return <Interventions />;
+        return <Interventions currentUser={currentUser} />;
+      case 'User Management':
+        return <UserManagement />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-full text-slate-400 p-12 text-center">
