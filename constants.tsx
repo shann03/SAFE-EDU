@@ -8,18 +8,23 @@ import {
   ClipboardList, 
   Monitor, 
   Settings,
-  UserCheck
 } from 'lucide-react';
-import { Student, Incident, IncidentType, User } from './types';
+import { Student, Incident, IncidentType, User, UserRole } from './types';
 
-export const NAV_ITEMS = [
-  { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
-  { name: 'Incidents', icon: <AlertTriangle size={20} />, path: '/incidents' },
-  { name: 'Students', icon: <Users size={20} />, path: '/students' },
-  { name: 'Interventions', icon: <ShieldAlert size={20} />, path: '/interventions' },
-  { name: 'Device Logs', icon: <Monitor size={20} />, path: '/devices' },
-  { name: 'Reports', icon: <ClipboardList size={20} />, path: '/reports' },
-  { name: 'Admin', icon: <Settings size={20} />, path: '/admin' },
+export interface NavItem {
+  name: string;
+  icon: React.ReactNode;
+  roles: UserRole[];
+}
+
+export const NAV_ITEMS: NavItem[] = [
+  { name: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: ['Teacher', 'Counselor', 'Administrator'] },
+  { name: 'Incidents', icon: <AlertTriangle size={20} />, roles: ['Teacher', 'Administrator'] },
+  { name: 'Students', icon: <Users size={20} />, roles: ['Teacher', 'Counselor', 'Administrator'] },
+  { name: 'Interventions', icon: <ShieldAlert size={20} />, roles: ['Counselor', 'Administrator'] },
+  { name: 'Device Logs', icon: <Monitor size={20} />, roles: ['Administrator'] },
+  { name: 'Reports', icon: <ClipboardList size={20} />, roles: ['Counselor', 'Administrator'] },
+  { name: 'Admin', icon: <Settings size={20} />, roles: ['Administrator'] },
 ];
 
 export const MOCK_STUDENTS: Student[] = [
@@ -72,7 +77,7 @@ export const MOCK_INCIDENTS: Incident[] = [
   {
     id: 'i1',
     student_id: 's1',
-    reported_by_user_id: 'u1',
+    reported_by_user_id: 'u_teacher',
     incident_type_id: 'it1',
     date_reported: '2023-10-24T10:00:00Z',
     date_occurred: '2023-10-24T09:15:00Z',
@@ -84,7 +89,7 @@ export const MOCK_INCIDENTS: Incident[] = [
   {
     id: 'i2',
     student_id: 's2',
-    reported_by_user_id: 'u2',
+    reported_by_user_id: 'u_teacher',
     incident_type_id: 'it2',
     date_reported: '2023-10-25T14:30:00Z',
     date_occurred: '2023-10-25T13:45:00Z',
@@ -95,10 +100,41 @@ export const MOCK_INCIDENTS: Incident[] = [
   }
 ];
 
-export const MOCK_USER: User = {
-  id: 'u1',
-  username: 'admin_sarah',
-  email: 'sarah.admin@school.edu',
-  full_name: 'Sarah Jenkins',
-  is_active: true
-};
+export const PREDEFINED_ACCOUNTS = [
+  {
+    email: 'teacher@gmail.com',
+    password: '12345678',
+    user: {
+      id: 'u_teacher',
+      username: 'teacher_jane',
+      email: 'teacher@gmail.com',
+      full_name: 'Jane Teacher',
+      is_active: true,
+      role: 'Teacher' as const
+    }
+  },
+  {
+    email: 'counselor@gmail.com',
+    password: '12345678',
+    user: {
+      id: 'u_counselor',
+      username: 'counselor_mark',
+      email: 'counselor@gmail.com',
+      full_name: 'Mark Counselor',
+      is_active: true,
+      role: 'Counselor' as const
+    }
+  },
+  {
+    email: 'admin@gmail.com',
+    password: '12345678',
+    user: {
+      id: 'u_admin',
+      username: 'admin_sarah',
+      email: 'admin@gmail.com',
+      full_name: 'Sarah Admin',
+      is_active: true,
+      role: 'Administrator' as const
+    }
+  }
+];

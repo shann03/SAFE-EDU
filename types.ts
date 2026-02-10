@@ -1,10 +1,13 @@
 
+export type UserRole = 'Teacher' | 'Counselor' | 'Administrator';
+
 export interface User {
   id: string;
   username: string;
   email: string;
   full_name: string;
   is_active: boolean;
+  role: UserRole;
   last_login?: string;
 }
 

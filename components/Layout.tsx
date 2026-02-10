@@ -9,9 +9,13 @@ interface LayoutProps {
   user: User;
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  onLogout: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, setActiveTab }) => {
+const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, setActiveTab, onLogout }) => {
+  // Filter navigation items based on the user's role
+  const filteredNavItems = NAV_ITEMS.filter(item => item.roles.includes(user.role));
+
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
       {/* Sidebar */}
@@ -25,7 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, setActiveTab
           </div>
           
           <nav className="space-y-1">
-            {NAV_ITEMS.map((item) => (
+            {filteredNavItems.map((item) => (
               <button
                 key={item.name}
                 onClick={() => setActiveTab(item.name)}
@@ -43,17 +47,20 @@ const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, setActiveTab
         </div>
 
         <div className="mt-auto p-6 border-t border-slate-200">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+          <div className="flex items-center gap-3 mb-4 overflow-hidden">
+            <div className="w-10 h-10 shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600 border border-indigo-200">
               {user.full_name.split(' ').map(n => n[0]).join('')}
             </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-semibold text-slate-800 truncate">{user.full_name}</p>
-              <p className="text-xs text-slate-500 truncate">Administrator</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-slate-800 truncate" title={user.full_name}>{user.full_name}</p>
+              <p className="text-xs text-indigo-600 font-medium truncate">{user.role}</p>
             </div>
           </div>
-          <button className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 font-medium transition-colors">
-            <LogOut size={16} />
+          <button 
+            onClick={onLogout}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-colors group"
+          >
+            <LogOut size={16} className="group-hover:-translate-x-0.5 transition-transform" />
             Sign Out
           </button>
         </div>
