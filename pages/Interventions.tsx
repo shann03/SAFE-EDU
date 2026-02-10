@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ShieldAlert, Clock, BrainCircuit, UserCheck, Plus, Lock, MessageSquare } from 'lucide-react';
+import { ShieldAlert, Clock, BrainCircuit, UserCheck, Plus, Lock, MessageSquare, ShieldCheck, History } from 'lucide-react';
 import { User } from '../types';
 
 interface InterventionsProps {
@@ -12,120 +12,130 @@ const Interventions: React.FC<InterventionsProps> = ({ currentUser }) => {
   const isAdmin = currentUser.role === 'Administrator';
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex justify-between items-end">
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex justify-between items-end border-b border-slate-200 pb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Welfare Interventions</h2>
-          <p className="text-slate-500">Manage behavioral growth plans and counseling records.</p>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Welfare Interventions</h2>
+          <p className="text-slate-500 font-medium">Coordinate behavioral growth plans and strictly confidential counseling records.</p>
         </div>
         {isCounselor && (
-          <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
-            <Plus size={18} />
-            New Intervention Plan
+          <button className="flex items-center gap-2 bg-teal-700 text-white px-5 py-3 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-teal-800 transition-all shadow-lg shadow-teal-100">
+            <Plus size={16} />
+            Initialize Intervention
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                <BrainCircuit size={24} />
-              </div>
-              <div>
-                <h4 className="font-bold text-slate-800">AI Counselor Assistant</h4>
-                <p className="text-sm text-slate-500">
-                  {isCounselor ? 'Analyze behavioral patterns to generate suggested strategies.' : 'Monitoring AI-generated behavioral insights (Read-only)'}
-                </p>
-              </div>
-            </div>
-            {isCounselor ? (
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors">
-                Launch Assistant
-              </button>
-            ) : (
-              <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase px-2 py-1 bg-slate-50 border border-slate-200 rounded">
-                <Lock size={12} /> Counselors Only
-              </div>
-            )}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="lg:col-span-3 space-y-8">
+          {/* Timeline View Header */}
+          <div className="flex items-center gap-2 text-slate-800 mb-2">
+            <History size={18} className="text-teal-600" />
+            <h4 className="text-sm font-black uppercase tracking-widest">Active Welfare Roadmap</h4>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
-              <h4 className="font-bold text-slate-700 text-sm uppercase tracking-wider">Active Programs</h4>
-              <span className="text-[10px] font-bold text-indigo-600">3 Total</span>
-            </div>
-            <div className="divide-y divide-slate-100">
-              {[
-                { title: 'Peer Relations Growth Plan', student: 'John Doe', progress: 80, date: 'Oct 24' },
-                { title: 'Academic Focus Strategy', student: 'Jane Smith', progress: 45, date: 'Oct 25' },
-                { title: 'Emotional Regulation Series', student: 'Alex Johnson', progress: 20, date: 'Oct 26' },
-              ].map((prog, i) => (
-                <div key={i} className="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
-                    <UserCheck size={20} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h5 className="font-bold text-slate-800">{prog.title}</h5>
-                        <p className="text-xs text-slate-500 mt-1">Student: {prog.student} • Started {prog.date}</p>
+          <div className="relative border-l-2 border-slate-200 ml-4 pl-10 space-y-12">
+            {[
+              { title: 'Social Integration Plan', student: 'John Doe', stage: 'Intervention Stage 3', date: 'Oct 24, 2023', status: 'Ongoing', color: 'teal' },
+              { title: 'Digital Wellness Counseling', student: 'Jane Smith', stage: 'Discovery Stage', date: 'Oct 25, 2023', status: 'Pending', color: 'amber' },
+              { title: 'Academic Recovery Program', student: 'Alex Johnson', stage: 'Follow-up Stage', date: 'Oct 26, 2023', status: 'Completed', color: 'slate' },
+            ].map((prog, i) => (
+              <div key={i} className="relative">
+                {/* Timeline Node */}
+                <div className={`absolute -left-[51px] top-0 w-5 h-5 rounded-full border-4 border-white shadow-md ${
+                  prog.color === 'teal' ? 'bg-teal-600' : prog.color === 'amber' ? 'bg-amber-500' : 'bg-slate-400'
+                }`}></div>
+                
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
+                          prog.color === 'teal' ? 'bg-teal-50 text-teal-700' : prog.color === 'amber' ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-600'
+                        }`}>
+                          {prog.stage}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-400">{prog.date}</span>
                       </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="text-xs font-bold text-indigo-600">{prog.progress}% Completed</span>
-                        {isCounselor && (
-                          <button className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 flex items-center gap-1">
-                            <MessageSquare size={10} /> Add Note
-                          </button>
-                        )}
-                      </div>
+                      <h5 className="text-lg font-bold text-slate-900 tracking-tight">{prog.title}</h5>
+                      <p className="text-sm font-medium text-slate-500 mt-1">Student Subject: <span className="text-slate-900 font-bold underline decoration-teal-500/30">{prog.student}</span></p>
                     </div>
-                    <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                      <div 
-                        className="bg-indigo-500 h-full rounded-full transition-all duration-1000" 
-                        style={{ width: `${prog.progress}%` }}
-                      ></div>
+                    <div className="flex items-center gap-3">
+                      {isCounselor && (
+                        <button className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-teal-600 transition-colors">
+                          <MessageSquare size={14} /> Add Note
+                        </button>
+                      )}
+                      <button className="px-4 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded shadow-sm hover:bg-slate-800 transition-all">
+                        Full Records
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-teal-900 text-white p-8 rounded-xl shadow-xl flex items-center justify-between overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+              <BrainCircuit size={120} />
+            </div>
+            <div className="relative z-10 max-w-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <BrainCircuit className="text-teal-400" size={24} />
+                <h4 className="text-xl font-bold">Welfare Analysis Assistant</h4>
+              </div>
+              <p className="text-teal-100 text-sm leading-relaxed font-medium mb-6">
+                Use AI-driven insights to analyze behavioral trends across incident histories. Ensure data protection standards are maintained before launching.
+              </p>
+              {isCounselor ? (
+                <button className="bg-white text-teal-900 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-teal-50 transition-all">
+                  Generate Assistance Roadmap
+                </button>
+              ) : (
+                <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-teal-400 px-3 py-1.5 bg-teal-950/50 rounded-lg border border-teal-800">
+                  <Lock size={12} /> Counselor Authorization Required
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-slate-900 text-white p-6 rounded-xl shadow-xl">
-            <div className="flex items-center gap-2 mb-4 border-b border-white/10 pb-4">
-              <Clock className="text-indigo-400" size={18} />
-              <h4 className="font-bold">Session Queue</h4>
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-t-4 border-teal-600">
+            <div className="flex items-center gap-2 mb-6">
+              <Clock className="text-teal-600" size={18} />
+              <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Confidential Agenda</h4>
             </div>
             <div className="space-y-4">
-              <div className="p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
-                <p className="text-[10px] font-bold text-indigo-400 uppercase">Today, 2:00 PM</p>
-                <p className="text-sm font-semibold mt-1">Review: John Doe</p>
+              <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 hover:border-teal-200 transition-all cursor-pointer">
+                <p className="text-[10px] font-black text-teal-700 uppercase tracking-widest">Today, 14:00</p>
+                <p className="text-sm font-bold text-slate-800 mt-1">Review: John Doe</p>
+                <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tighter">Case Reference: B-2023-01</p>
               </div>
-              <div className="p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
-                <p className="text-[10px] font-bold text-indigo-400 uppercase">Tomorrow, 9:30 AM</p>
-                <p className="text-sm font-semibold mt-1">Parent Conf: Alex J.</p>
+              <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 hover:border-teal-200 transition-all cursor-pointer">
+                <p className="text-[10px] font-black text-teal-700 uppercase tracking-widest">Tomorrow, 09:30</p>
+                <p className="text-sm font-bold text-slate-800 mt-1">Parent Conf: Alex J.</p>
+                <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tighter">Legal Oversight Req.</p>
               </div>
             </div>
-            <button className="w-full mt-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors">
-              Full Calendar
-            </button>
           </div>
 
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <ShieldAlert className="text-red-500" size={18} />
-              <h4 className="font-bold text-slate-800 text-sm">Action Required</h4>
+              <ShieldAlert className="text-amber-500" size={18} />
+              <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Welfare Alerts</h4>
             </div>
-            <div className="space-y-3">
-              <p className="text-xs text-slate-500 leading-relaxed italic border-l-2 border-indigo-200 pl-3">
-                "Waitlisted intervention for Grade 9 behavioral shift identified in Sep."
+            <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg">
+              <p className="text-xs text-amber-900 font-bold leading-relaxed italic">
+                "Waitlisted intervention for Grade 9 behavioral shift identified in Sep. requires immediate counselor assignment."
               </p>
-              <button className="text-[10px] font-bold text-indigo-600 hover:underline">Review Details →</button>
             </div>
+          </div>
+          
+          <div className="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg text-slate-500">
+             <ShieldCheck size={14} className="text-teal-600" />
+             <span className="text-[9px] font-black uppercase tracking-widest">RA 10173 Certified</span>
           </div>
         </div>
       </div>
