@@ -7,15 +7,23 @@ import Incidents from './pages/Incidents';
 import Interventions from './pages/Interventions';
 import UserManagement from './pages/UserManagement';
 import Login from './pages/Login';
-import { User } from './types';
+import { User, Incident, Student, BehavioralIntervention, DeviceUsageRecord, ParentGuardian } from './types';
+import { MOCK_INCIDENTS, MOCK_STUDENTS, MOCK_INTERVENTIONS, MOCK_DEVICE_LOGS, MOCK_PARENTS } from './constants';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [isInitializing, setIsInitializing] = useState(true);
+  
+  // Fully hydrated state
+  const [incidents, setIncidents] = useState<Incident[]>(MOCK_INCIDENTS);
+  const [students] = useState<Student[]>(MOCK_STUDENTS);
+  const [interventions, setInterventions] = useState<BehavioralIntervention[]>(MOCK_INTERVENTIONS);
+  const [deviceLogs] = useState<DeviceUsageRecord[]>(MOCK_DEVICE_LOGS);
+  const [parents] = useState<ParentGuardian[]>(MOCK_PARENTS);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // Check local storage for persistent session
     const savedUser = localStorage.getItem('edutrack_user');
     if (savedUser) {
       try {
@@ -38,11 +46,19 @@ const App: React.FC = () => {
     setActiveTab('Dashboard');
   };
 
+  const addIncident = (newIncident: Incident) => {
+    setIncidents(prev => [newIncident, ...prev]);
+  };
+
+  const updateIncidentStatus = (id: string, status: Incident['status']) => {
+    setIncidents(prev => prev.map(inc => inc.id === id ? { ...inc, status } : inc));
+  };
+
   if (isInitializing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="w-12 h-12 bg-indigo-600 rounded-xl mb-4"></div>
+          <div className="w-12 h-12 bg-slate-900 rounded-xl mb-4"></div>
           <div className="h-4 w-32 bg-slate-200 rounded"></div>
         </div>
       </div>
@@ -56,13 +72,31 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'Dashboard':
-        return <Dashboard />;
+        return <Dashboard incidents={incidents} students={students} />;
       case 'Students':
-        return <Students currentUser={currentUser} />;
+        return (
+          <Students 
+            currentUser={currentUser} 
+            incidents={incidents} 
+            students={students} 
+            searchQuery={searchQuery}
+            parents={parents}
+            deviceLogs={deviceLogs}
+          />
+        );
       case 'Incidents':
-        return <Incidents currentUser={currentUser} />;
+        return (
+          <Incidents 
+            currentUser={currentUser} 
+            incidents={incidents} 
+            students={students} 
+            onAddIncident={addIncident} 
+            onUpdateStatus={updateIncidentStatus} 
+            searchQuery={searchQuery} 
+          />
+        );
       case 'Interventions':
-        return <Interventions currentUser={currentUser} />;
+        return <Interventions currentUser={currentUser} incidents={incidents} students={students} interventions={interventions} />;
       case 'User Management':
         return <UserManagement />;
       default:
@@ -84,6 +118,8 @@ const App: React.FC = () => {
       activeTab={activeTab} 
       setActiveTab={setActiveTab}
       onLogout={handleLogout}
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
     >
       {renderContent()}
     </Layout>

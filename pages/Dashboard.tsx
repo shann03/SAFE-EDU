@@ -5,13 +5,21 @@ import {
   PieChart, Pie, Cell, AreaChart, Area 
 } from 'recharts';
 import { AlertTriangle, UserCheck, TrendingUp, ShieldAlert, CheckCircle2 } from 'lucide-react';
-import { MOCK_INCIDENTS, MOCK_STUDENTS } from '../constants';
+import { Incident, Student } from '../types';
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+  incidents: Incident[];
+  students: Student[];
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ incidents, students }) => {
+  const activeIncidents = incidents.filter(i => i.status !== 'Resolved' && i.status !== 'Closed').length;
+  const resolutionRate = Math.round((incidents.filter(i => i.status === 'Resolved').length / (incidents.length || 1)) * 100);
+
   const stats = [
-    { label: 'Active Incidents', value: '12', icon: <AlertTriangle className="text-amber-600" />, trend: 'Pending Review', color: 'bg-amber-50 border-amber-200' },
-    { label: 'Enrollment Coverage', value: '1,240', icon: <UserCheck className="text-slate-600" />, trend: 'Validated Records', color: 'bg-slate-50 border-slate-200' },
-    { label: 'Resolution Rate', value: '84%', icon: <CheckCircle2 className="text-teal-600" />, trend: 'Academic Q2 Target', color: 'bg-teal-50 border-teal-200' },
+    { label: 'Active Incidents', value: activeIncidents.toString(), icon: <AlertTriangle className="text-amber-600" />, trend: 'Pending Review', color: 'bg-amber-50 border-amber-200' },
+    { label: 'Verified Subjects', value: students.length.toString(), icon: <UserCheck className="text-slate-600" />, trend: 'Validated Records', color: 'bg-slate-50 border-slate-200' },
+    { label: 'Resolution Rate', value: `${resolutionRate}%`, icon: <CheckCircle2 className="text-teal-600" />, trend: 'Academic Q2 Target', color: 'bg-teal-50 border-teal-200' },
     { label: 'Ongoing Interventions', value: '08', icon: <ShieldAlert className="text-blue-600" />, trend: 'Guidance Dept.', color: 'bg-blue-50 border-blue-200' },
   ];
 
@@ -19,13 +27,13 @@ const Dashboard: React.FC = () => {
     { name: 'Aug', incidents: 4 },
     { name: 'Sep', incidents: 15 },
     { name: 'Oct', incidents: 22 },
-    { name: 'Nov', incidents: 12 },
+    { name: 'Nov', incidents: incidents.length },
     { name: 'Dec', incidents: 8 },
   ];
 
   const typeData = [
-    { name: 'Bullying', value: 400 },
-    { name: 'Dishonesty', value: 300 },
+    { name: 'Bullying', value: incidents.filter(i => i.incident_type_id === 'it1').length || 1 },
+    { name: 'Dishonesty', value: incidents.filter(i => i.incident_type_id === 'it2').length || 1 },
     { name: 'Property', value: 150 },
     { name: 'Verbal', value: 200 },
   ];
@@ -41,7 +49,7 @@ const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, idx) => (
-          <div key={idx} className={`p-6 rounded-xl border ${stat.color} shadow-sm flex items-start justify-between bg-white`}>
+          <div key={idx} className={`p-6 rounded-xl border ${stat.color} shadow-sm flex items-start justify-between bg-white cursor-pointer hover:shadow-md transition-all active:scale-[0.98]`}>
             <div>
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
               <h3 className="text-3xl font-bold text-slate-900 mt-1">{stat.value}</h3>
@@ -58,12 +66,6 @@ const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
           <div className="flex justify-between items-center mb-10">
             <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">Monthly Incident Volume</h4>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-slate-900"></div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Reported Case</span>
-              </div>
-            </div>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -109,7 +111,7 @@ const Dashboard: React.FC = () => {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-2xl font-black text-slate-900">1,250</span>
+              <span className="text-2xl font-black text-slate-900">{incidents.length}</span>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Events</span>
             </div>
           </div>
@@ -126,23 +128,21 @@ const Dashboard: React.FC = () => {
 
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
-          <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">Verified Case Stream</h4>
-          <button className="text-[10px] font-black text-teal-700 hover:text-teal-800 uppercase tracking-widest">Access Audit History →</button>
+          <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">Recent Case Log</h4>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-slate-50/50">
               <tr>
                 <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Subject</th>
-                <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Violation Tag</th>
                 <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Official Date</th>
-                <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Legal Status</th>
+                <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
                 <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">View</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {MOCK_INCIDENTS.map((inc) => {
-                const student = MOCK_STUDENTS.find(s => s.id === inc.student_id);
+              {incidents.slice(0, 5).map((inc) => {
+                const student = students.find(s => s.id === inc.student_id);
                 return (
                   <tr key={inc.id} className="hover:bg-slate-50 transition-all group">
                     <td className="px-8 py-5">
@@ -154,14 +154,11 @@ const Dashboard: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-8 py-5">
-                      <span className="text-xs font-semibold text-slate-600">Bullying/Cyber</span>
-                    </td>
-                    <td className="px-8 py-5">
-                      <span className="text-xs font-bold text-slate-400">{new Date(inc.date_reported).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                      <span className="text-xs font-bold text-slate-400">{new Date(inc.date_reported).toLocaleDateString('en-PH')}</span>
                     </td>
                     <td className="px-8 py-5">
                       <span className={`px-3 py-1.5 rounded text-[10px] font-black uppercase tracking-widest ${
-                        inc.status === 'Resolved' ? 'bg-teal-50 text-teal-700 border border-teal-100' : 'bg-amber-50 text-amber-700 border border-amber-100'
+                        inc.status === 'Resolved' ? 'bg-teal-50 text-teal-700' : 'bg-amber-50 text-amber-700'
                       }`}>
                         {inc.status}
                       </span>

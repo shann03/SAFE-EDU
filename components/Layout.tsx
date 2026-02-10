@@ -10,9 +10,11 @@ interface LayoutProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onLogout: () => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, setActiveTab, onLogout }) => {
+const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, setActiveTab, onLogout, searchQuery, setSearchQuery }) => {
   const filteredNavItems = NAV_ITEMS.filter(item => item.roles.includes(user.role));
 
   return (
@@ -72,6 +74,8 @@ const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, setActiveTab
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-600 transition-colors" size={16} />
             <input 
               type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search Student ID, Name or Incident..."
               className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm focus:ring-1 focus:ring-teal-500 transition-all outline-none placeholder:text-slate-400 font-medium"
             />

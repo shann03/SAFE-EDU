@@ -2,6 +2,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 // Analyze student behavioral history using Gemini API
+// Upgraded to gemini-3-pro-preview for advanced reasoning on behavioral data
 export const getBehavioralInsight = async (studentHistory: any[]) => {
   // Always use a named parameter with process.env.API_KEY directly as per guidelines
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -15,7 +16,7 @@ export const getBehavioralInsight = async (studentHistory: any[]) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3-pro-preview",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
